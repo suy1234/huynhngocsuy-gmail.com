@@ -229,7 +229,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'Module' => \Nwidart\Modules\Facades\Module::class,
-
+        'RedisManager' => Illuminate\Support\Facades\Redis::class,
     ],
 
 ];

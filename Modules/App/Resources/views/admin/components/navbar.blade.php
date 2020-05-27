@@ -41,13 +41,15 @@ $title = trans(\Route::getCurrentRoute()->action['module'].'::'.$resource.'.modu
 
 			<a href="#" class="header-elements-toggle text-default d-md-none"><i class="icon-more"></i></a>
 		</div>
-
 		<div class="header-elements d-none">
 			<div class="breadcrumb justify-content-center">
 				@if (isset($buttons))
+				@php($edit = !empty($id) ? ['id' => $id] : [] )
 				@foreach($buttons as $view)
-				<a href="{{ route('admin.'.$resource.'.'.$view) }}" class="btn {{ config('core.btn_class.'.$view.'.class') }} btn-sm btn-actions btn-{{ $view }}" style="margin-left: 5px;">
-					<span class="{{ config('core.btn_class.'.$view.'.icon') }}"></span> {{ trans("resource.{$view}") }}
+				
+				<a href="{{ route('admin.'.$resource.'.'.$view, $edit) }}" class="btn {{ config('erp.btn_class.'.$view.'.class') }} btn-sm btn-actions btn-{{ $view }}" style="margin-left: 5px;">
+					<b><span class="{{ config('erp.btn_class.'.$view.'.icon') }}"></span> </b> 
+					 {{ trans("resource.{$view}") }}
 				</a>
 				@endforeach
 				@endif

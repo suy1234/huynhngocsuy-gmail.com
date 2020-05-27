@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 trait HasCrudActions
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
+    public function __construct()
+    {
+        $this->middleware('admin');
+        $this->lang = 'vi';
+    }
+
     public function index(Request $request)
     {
         if ($request->has('table')) {
@@ -21,6 +21,10 @@ trait HasCrudActions
         return view("{$this->viewPath}.index");
     }
 
+    public function table(Request $request)
+    {
+        return $this->getModel()->table($request);
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -28,11 +32,9 @@ trait HasCrudActions
      */
     public function create()
     {
-        // $data = array_merge([
-        //     'tabs' => TabManager::get($this->getModel()->getTable()),
-        //     $this->getResourceName() => $this->getModel(),
-        // ], $this->getFormData('create'));
-        $data = [];
+        $data = array_merge([
+            $this->getResourceName() => $this->getModel(),
+        ], $this->getFormData('create'), $this->getResourceData());
         return view("{$this->viewPath}.create", $data);
     }
 
@@ -54,9 +56,7 @@ trait HasCrudActions
         if (method_exists($this, 'redirectTo')) {
             return $this->redirectTo($entity);
         }
-
-        return redirect()->route("{$this->getRoutePrefix()}.index")
-            ->withSuccess(trans('admin::messages.resource_saved', ['resource' => $this->getLabel()]));
+        return response()->json(['success' => true, 'resource' => $this->getLabel().' '.trans('validation.attributes.create_success'), 'url' => route("{$this->getRoutePrefix()}.index")]);
     }
 
     /**
@@ -84,10 +84,8 @@ trait HasCrudActions
     public function edit($id)
     {
         $data = array_merge([
-            'tabs' => TabManager::get($this->getModel()->getTable()),
             $this->getResourceName() => $this->getEntity($id),
-        ], $this->getFormData('edit', $id));
-
+        ], $this->getFormData('edit', $id), $this->getResourceData());
         return view("{$this->viewPath}.edit", $data);
     }
 
@@ -109,12 +107,10 @@ trait HasCrudActions
         $this->searchable($entity);
 
         if (method_exists($this, 'redirectTo')) {
-            return $this->redirectTo($entity)
-                ->withSuccess(trans('admin::messages.resource_saved', ['resource' => $this->getLabel()]));
+            return response()->json(['success' => true, 'resource' => $this->getLabel().' '.trans('validation.attributes.update_success')]);
         }
 
-        return redirect()->route("{$this->getRoutePrefix()}.index")
-            ->withSuccess(trans('admin::messages.resource_saved', ['resource' => $this->getLabel()]));
+        return response()->json(['success' => true, 'resource' => $this->getLabel().' '.trans('validation.attributes.update_success')]);
     }
 
     /**
@@ -123,12 +119,28 @@ trait HasCrudActions
      * @param string $ids
      * @return void
      */
-    public function destroy($ids)
+    public function destroy(Request $request)
     {
-        $this->getModel()
-            ->withoutGlobalScope('active')
-            ->whereIn('id', explode(',', $ids))
-            ->delete();
+        $ids = !empty($request->ids) ? explode(',', $request->ids) : [];
+        $result = $this->getModel()
+        ->withoutGlobalScope('active')
+        ->whereIn('id', $ids)
+        ->delete();
+        return response()->json([
+            'success' => $result
+        ]);
+    }
+
+    public function status(Request $request)
+    {
+        $ids = !empty($request->ids) ? explode(',', $request->ids) : [];
+        $result = $this->getModel()
+        ->withoutGlobalScope('active')
+        ->whereIn('id', $ids)
+        ->update(['status' => $request->status]);
+        return response()->json([
+            'success' => $result
+        ]);
     }
 
     /**
@@ -140,9 +152,9 @@ trait HasCrudActions
     protected function getEntity($id)
     {
         return $this->getModel()
-            ->with($this->relations())
-            ->withoutGlobalScope('active')
-            ->findOrFail($id);
+        ->with($this->relations())
+        ->withoutGlobalScope('active')
+        ->findOrFail($id);
     }
 
     /**
@@ -282,5 +294,10 @@ trait HasCrudActions
         if ($this->isSearchable($entity)) {
             $entity->searchable();
         }
+    }
+
+    public function getResourceData()
+    {
+        return [];
     }
 }

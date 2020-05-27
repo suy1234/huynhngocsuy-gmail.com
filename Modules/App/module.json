@@ -1,14 +1,13 @@
 {
     "name": "App",
     "alias": "app",
-    "description": "",
-    "keywords": [],
+    "description": "The ERP App Module.",
     "active": 1,
-    "order": 0,
+    "order": 10,
     "providers": [
-        "Modules\\App\\Providers\\AppServiceProvider"
-    ],
-    "aliases": {},
-    "files": [],
-    "requires": []
+        "Maatwebsite\\Sidebar\\SidebarServiceProvider",
+        "Modules\\App\\Providers\\RouteServiceProvider",
+        "Modules\\App\\Providers\\AppServiceProvider",
+        "Modules\\App\\Providers\\SidebarServiceProvider"
+    ]
 }

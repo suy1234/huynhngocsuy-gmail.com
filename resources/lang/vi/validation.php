@@ -144,7 +144,8 @@ return [
     | of "email". This simply helps us make messages a little cleaner.
     |
     */
-
+    'delete_alert'         => 'Bạn có muốn xóa :resource này không.',
+    'permission_denied'         => 'Bạn không có quyền truy cập vào trang :permission',
     'attributes' => [
         'find'                  => 'Tìm kiếm',
         'account'               => 'Tài khoản',
@@ -181,7 +182,9 @@ return [
         'available'             => 'có sẵn',
         'size'                  => 'kích thước',
         'success'               => 'Thành công',
-        'error'                 => 'Thất bại',
+        'update_success'        => 'cập nhật thành công',
+        'create_success'        => 'tạo mới thành công',
+        'error'                 => 'Thao tác thất bại',
         'order_list'            => 'Xem danh sách đơn hàng',
         'detail'                => 'Xem chi tiết khách hàng',
         'update'                => 'Cập nhật',
@@ -191,6 +194,11 @@ return [
         'save'                  => 'Lưu',
         'select'                => 'Vui lòng chọn',
         'data_empty'            => 'Không có dữ liệu',
+        'created_at'            => 'Ngày tạo',
+        'updated_at'            => 'Ngày cập nhật',
+        'alert'                 => 'Cảnh báo!!!',
+        'alert_cancel'          => 'Hủy thao tác',
+        'alert_success'         => 'Vâng tôi muốn',
     ],
 
 ];

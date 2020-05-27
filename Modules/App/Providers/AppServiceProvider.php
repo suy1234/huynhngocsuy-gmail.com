@@ -5,7 +5,7 @@ namespace Modules\App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 use Illuminate\Support\Facades\View;
-use Modules\Admin\Http\ViewComposers\AssetsComposer;
+use Modules\App\Http\ViewComposers\AssetsComposer;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -22,11 +22,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        View::composer('admin::layout', AssetsComposer::class);
+        View::composer('app::layout', AssetsComposer::class);
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
         $this->registerFactories();
+        $this->registerInBackendState();
         $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
     }
 
@@ -47,13 +48,7 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function registerConfig()
     {
-        $this->publishes([
-            __DIR__.'/../Config/config.php' => config_path('app.php'),
-            __DIR__.'/../Config/admin.php' => config_path('app.php'),
-        ], 'config');
-        $this->mergeConfigFrom(
-            __DIR__.'/../Config/admin.php', __DIR__.'/../Config/config.php', 'app'
-        );
+       
     }
 
     /**
@@ -112,5 +107,36 @@ class AppServiceProvider extends ServiceProvider
     public function provides()
     {
         return [];
+    }
+
+    /**
+     * Register inBackend state to the IoC container.
+     *
+     * @return void
+     */
+    private function registerInBackendState()
+    {
+        if ($this->app->runningInConsole()) {
+            return $this->app['inBackend'] = false;
+        }
+        // $index = in_array($this->app['request']->segment(1), setting('supported_locales'))
+        //     ? 2
+        //     : 1;
+
+        // $this->app['inBackend'] = $this->app['request']->segment($index) === 'admin';
+
+        $this->app['inBackend'] = $this->app['request']->segment(1) === 'admin';
+    }
+
+    /**
+     * Blacklist admin routes on frontend for ziggy package.
+     *
+     * @return void
+     */
+    private function blacklistAdminRoutesOnFrontend()
+    {
+        if (! $this->app['inBackend'] && $this->app->configurationIsCached()) {
+            $this->app['config']->set('ziggy.blacklist', ['admin.*']);
+        }
     }
 }

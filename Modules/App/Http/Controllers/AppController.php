@@ -5,6 +5,7 @@ namespace Modules\App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class AppController extends Controller
 {
@@ -12,6 +13,17 @@ class AppController extends Controller
      * Display a listing of the resource.
      * @return Response
      */
+    public function login()
+    {
+        $login = array(
+          'name' => 'admin',
+          'password' => 'admin',
+        );
+        if (Auth::attempt($login))
+        {
+          dd('oki')
+        }
+    }
     public function index()
     {
         return view('app::index');

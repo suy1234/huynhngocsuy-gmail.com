@@ -16,10 +16,7 @@ Route::get('/install', function() {
 		array(
 			'--path' => 'database/migrations',
 			'--force' => true));
-	return response()->json([
-		'success' => true,
-		'msg' => 'Done'
-	]);
+	return "done";
 
 });
 
@@ -37,3 +34,8 @@ Route::get('/clear', function() {
 Route::get('/', function () {
 	return view('welcome');
 });
+
+Route::get('login', [
+	'as' => 'admin.login.index',
+	'uses' => 'AppController@login',
+]);
